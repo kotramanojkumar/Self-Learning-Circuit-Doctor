@@ -1,0 +1,29 @@
+================================================================================
+SELF-LEARNING CIRCUIT DOCTOR - COMPREHENSIVE EXPERIMENTAL RESULTS
+================================================================================
+
+Total Dataset Size: 1950 samples (13 classes, 150 samples/class)
+Training Set Size : 1560 samples (120 per class, 80%)
+Testing Set Size  : 390 samples (30 per class, 20%)
+
+OVERALL PERFORMANCE:
+  Method A (Baseline Rule-Based Threshold Detector): 100.00% Accuracy
+  Method B (Standardized Nearest Centroid Classifier): 100.00% Accuracy
+
+--------------------------------------------------------------------------------
+Code   Operating Condition      Precision  Recall     F1-Score   Support
+--------------------------------------------------------------------------------
+F0     Normal Operation         1.0000     1.0000     1.0000     30
+F1     R1 Open Circuit          1.0000     1.0000     1.0000     30
+F2     R2 Open Circuit          1.0000     1.0000     1.0000     30
+F3     R3 Open Circuit          1.0000     1.0000     1.0000     30
+F4     R4 Open Circuit          1.0000     1.0000     1.0000     30
+F5     R1 Short Circuit         1.0000     1.0000     1.0000     30
+F6     R2 Short Circuit         1.0000     1.0000     1.0000     30
+F7     R3 Short Circuit         1.0000     1.0000     1.0000     30
+F8     R4 Short Circuit         1.0000     1.0000     1.0000     30
+F9     R1 +50% (1.5k)           1.0000     1.0000     1.0000     30
+F10    R2 +50% (3.0k)           1.0000     1.0000     1.0000     30
+F11    R3 -50% (0.75k)          1.0000     1.0000     1.0000     30
+F12    R4 -50% (1.5k)           1.0000     1.0000     1.0000     30
+--------------------------------------------------------------------------------
