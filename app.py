@@ -105,11 +105,15 @@ def run_streamlit_app():
             """)
 
         st.markdown("---")
-        st.subheader("Diagnostic Input Mode")
+        st.subheader("Diagnostic Input Mode & Circuit Workbench")
 
         input_mode = st.radio(
-            "Select Measurement Source:",
-            ["Preset Simulated Fault Condition", "Manual DMM Measurement Entry"],
+            "Select Workbench Mode:",
+            [
+                "🛠️ Build & Test Custom Circuit (Virtual Workbench)",
+                "⚡ Preset Fault Scenarios (Inject from Catalog)",
+                "🔢 Manual DMM Measurement Entry (Hardware / Falstad)"
+            ],
             horizontal=True
         )
 
@@ -117,7 +121,144 @@ def run_streamlit_app():
         data_source_label = ""
         ground_truth_label = None
 
-        if input_mode == "Preset Simulated Fault Condition":
+        if input_mode == "🛠️ Build & Test Custom Circuit (Virtual Workbench)":
+            data_source_label = "Interactive Virtual Workbench (User-Constructed Circuit)"
+            st.markdown("##### 🎛️ Customize Circuit Components & Test Health:")
+
+            # Initialize session state for resistors if not present
+            if 'wb_r1_state' not in st.session_state:
+                st.session_state.wb_r1_state = "Healthy (1.0 kΩ)"
+            if 'wb_r2_state' not in st.session_state:
+                st.session_state.wb_r2_state = "Healthy (2.0 kΩ)"
+            if 'wb_r3_state' not in st.session_state:
+                st.session_state.wb_r3_state = "Healthy (1.5 kΩ)"
+            if 'wb_r4_state' not in st.session_state:
+                st.session_state.wb_r4_state = "Healthy (3.0 kΩ)"
+            if 'wb_vs' not in st.session_state:
+                st.session_state.wb_vs = 10.0
+
+            # Quick Action Toolbar
+            col_act1, col_act2, col_act3 = st.columns([1, 1, 2])
+            with col_act1:
+                if st.button("🟢 Reset to Healthy"):
+                    st.session_state.wb_r1_state = "Healthy (1.0 kΩ)"
+                    st.session_state.wb_r2_state = "Healthy (2.0 kΩ)"
+                    st.session_state.wb_r3_state = "Healthy (1.5 kΩ)"
+                    st.session_state.wb_r4_state = "Healthy (3.0 kΩ)"
+                    st.session_state.wb_vs = 10.0
+                    st.rerun()
+
+            with col_act2:
+                if st.button("🎲 Break a Mystery Part"):
+                    mystery_res = np.random.choice(['r1', 'r2', 'r3', 'r4'])
+                    if mystery_res == 'r1':
+                        st.session_state.wb_r1_state = np.random.choice(["Open Circuit (Broken)", "Short Circuit (Bypassed)", "+50% Drift (1.5 kΩ)"])
+                    elif mystery_res == 'r2':
+                        st.session_state.wb_r2_state = np.random.choice(["Open Circuit (Broken)", "Short Circuit (To GND)", "+50% Drift (3.0 kΩ)"])
+                    elif mystery_res == 'r3':
+                        st.session_state.wb_r3_state = np.random.choice(["Open Circuit (Broken)", "Short Circuit (Direct Bridge)", "-50% Drift (0.75 kΩ)"])
+                    else:
+                        st.session_state.wb_r4_state = np.random.choice(["Open Circuit (Broken)", "Short Circuit (To GND)", "-50% Drift (1.5 kΩ)"])
+                    st.rerun()
+
+            col_cfg1, col_cfg2 = st.columns([2, 1])
+            with col_cfg1:
+                custom_vs = st.slider("DC Power Supply Voltage Vs (Volts):", 1.0, 20.0, float(st.session_state.wb_vs), 0.5)
+                st.session_state.wb_vs = custom_vs
+            with col_cfg2:
+                noise_slider = st.slider("Instrument Measurement Noise (mV):", 0, 100, 15) / 1000.0
+
+            # 4 Resistor Columns
+            col_r1, col_r2, col_r3, col_r4 = st.columns(4)
+
+            with col_r1:
+                st.markdown("**Resistor R1** (Nom: `1.0 kΩ`)")
+                r1_opts = ["Healthy (1.0 kΩ)", "Open Circuit (Broken)", "Short Circuit (Bypassed)", "+50% Drift (1.5 kΩ)", "Custom Value (Ω)"]
+                idx_r1 = r1_opts.index(st.session_state.wb_r1_state) if st.session_state.wb_r1_state in r1_opts else 0
+                r1_choice = st.selectbox("R1 Condition:", r1_opts, index=idx_r1, key="sel_r1")
+                st.session_state.wb_r1_state = r1_choice
+                if r1_choice == "Healthy (1.0 kΩ)":
+                    val_r1 = 1000.0
+                elif r1_choice == "Open Circuit (Broken)":
+                    val_r1 = 1e9
+                elif r1_choice == "Short Circuit (Bypassed)":
+                    val_r1 = 1e-6
+                elif r1_choice == "+50% Drift (1.5 kΩ)":
+                    val_r1 = 1500.0
+                else:
+                    val_r1 = st.number_input("R1 Resistance (Ω):", min_value=1.0, max_value=500000.0, value=1000.0, step=50.0)
+
+            with col_r2:
+                st.markdown("**Resistor R2** (Nom: `2.0 kΩ`)")
+                r2_opts = ["Healthy (2.0 kΩ)", "Open Circuit (Broken)", "Short Circuit (To GND)", "+50% Drift (3.0 kΩ)", "Custom Value (Ω)"]
+                idx_r2 = r2_opts.index(st.session_state.wb_r2_state) if st.session_state.wb_r2_state in r2_opts else 0
+                r2_choice = st.selectbox("R2 Condition:", r2_opts, index=idx_r2, key="sel_r2")
+                st.session_state.wb_r2_state = r2_choice
+                if r2_choice == "Healthy (2.0 kΩ)":
+                    val_r2 = 2000.0
+                elif r2_choice == "Open Circuit (Broken)":
+                    val_r2 = 1e9
+                elif r2_choice == "Short Circuit (To GND)":
+                    val_r2 = 1e-6
+                elif r2_choice == "+50% Drift (3.0 kΩ)":
+                    val_r2 = 3000.0
+                else:
+                    val_r2 = st.number_input("R2 Resistance (Ω):", min_value=1.0, max_value=500000.0, value=2000.0, step=50.0)
+
+            with col_r3:
+                st.markdown("**Resistor R3** (Nom: `1.5 kΩ`)")
+                r3_opts = ["Healthy (1.5 kΩ)", "Open Circuit (Broken)", "Short Circuit (Direct Bridge)", "-50% Drift (0.75 kΩ)", "Custom Value (Ω)"]
+                idx_r3 = r3_opts.index(st.session_state.wb_r3_state) if st.session_state.wb_r3_state in r3_opts else 0
+                r3_choice = st.selectbox("R3 Condition:", r3_opts, index=idx_r3, key="sel_r3")
+                st.session_state.wb_r3_state = r3_choice
+                if r3_choice == "Healthy (1.5 kΩ)":
+                    val_r3 = 1500.0
+                elif r3_choice == "Open Circuit (Broken)":
+                    val_r3 = 1e9
+                elif r3_choice == "Short Circuit (Direct Bridge)":
+                    val_r3 = 1e-6
+                elif r3_choice == "-50% Drift (0.75 kΩ)":
+                    val_r3 = 750.0
+                else:
+                    val_r3 = st.number_input("R3 Resistance (Ω):", min_value=1.0, max_value=500000.0, value=1500.0, step=50.0)
+
+            with col_r4:
+                st.markdown("**Resistor R4** (Nom: `3.0 kΩ`)")
+                r4_opts = ["Healthy (3.0 kΩ)", "Open Circuit (Broken)", "Short Circuit (To GND)", "-50% Drift (1.5 kΩ)", "Custom Value (Ω)"]
+                idx_r4 = r4_opts.index(st.session_state.wb_r4_state) if st.session_state.wb_r4_state in r4_opts else 0
+                r4_choice = st.selectbox("R4 Condition:", r4_opts, index=idx_r4, key="sel_r4")
+                st.session_state.wb_r4_state = r4_choice
+                if r4_choice == "Healthy (3.0 kΩ)":
+                    val_r4 = 3000.0
+                elif r4_choice == "Open Circuit (Broken)":
+                    val_r4 = 1e9
+                elif r4_choice == "Short Circuit (To GND)":
+                    val_r4 = 1e-6
+                elif r4_choice == "-50% Drift (1.5 kΩ)":
+                    val_r4 = 1500.0
+                else:
+                    val_r4 = st.number_input("R4 Resistance (Ω):", min_value=1.0, max_value=500000.0, value=3000.0, step=50.0)
+
+            # Solve the user-built circuit
+            custom_net = DCResistorNetwork(Vs=custom_vs, R1=val_r1, R2=val_r2, R3=val_r3, R4=val_r4)
+            sim_state = custom_net.solve()
+            rng = np.random.RandomState(None)
+            meas_va = max(0.0, sim_state.VA + rng.normal(0, noise_slider))
+            meas_vb = max(0.0, sim_state.VB + rng.normal(0, noise_slider))
+            meas_is = max(0.0, sim_state.Is + rng.normal(0, noise_slider))
+
+            # Display live probe telemetry cards
+            st.markdown("##### 📟 Live Circuit Multimeter Probes:")
+            p_col1, p_col2, p_col3, p_col4, p_col5 = st.columns(5)
+            p_col1.metric("Node A Voltage (VA)", f"{meas_va:.3f} V", delta=f"{meas_va - 5.806:.3f} V vs Nom")
+            p_col2.metric("Node B Voltage (VB)", f"{meas_vb:.3f} V", delta=f"{meas_vb - 3.871:.3f} V vs Nom")
+            p_col3.metric("Source Current (Is)", f"{meas_is:.3f} mA", delta=f"{meas_is - 4.194:.3f} mA vs Nom")
+            req_str = f"{sim_state.Req:.1f} Ω" if sim_state.Req < 1e6 else "∞ (Open)"
+            p_col4.metric("Input Resistance (Req)", req_str)
+            p_total_mw = custom_vs * meas_is
+            p_col5.metric("Total Power (Pin)", f"{p_total_mw:.2f} mW")
+
+        elif input_mode == "⚡ Preset Fault Scenarios (Inject from Catalog)":
             data_source_label = "Model-Generated Simulated Fault"
             col_sel1, col_sel2 = st.columns([2, 1])
             with col_sel1:
@@ -153,11 +294,74 @@ def run_streamlit_app():
                 meas_is = st.number_input("Source Current Is (mA)", min_value=0.0, max_value=25.0, value=4.194, step=0.01)
 
         # Run Diagnosis Button
-        if st.button("🔍 Run Diagnostic Engine", type="primary"):
+        if st.button("🩺 Power ON & Check Circuit Health", type="primary"):
             diag = clf.predict_detailed(meas_va, meas_vb, meas_is)
             base_diag = baseline.predict_single(meas_va, meas_vb, meas_is)
 
-            st.markdown("### 📋 Diagnostic Telemetry Report")
+            # Health index score relative to nominal 'F0'
+            feat_vec = np.array([[meas_va, meas_vb, meas_is]])
+            feat_norm = (feat_vec - clf.scaler_mean_) / clf.scaler_scale_
+            nom_center = clf.centroids_['F0']
+            d_nom = float(np.linalg.norm(feat_norm - nom_center))
+            health_score = int(np.clip(100.0 * np.exp(-0.5 * (d_nom ** 2)), 0, 100))
+
+            st.markdown("---")
+            st.markdown("### 📋 Circuit Doctor Health Inspection Report")
+
+            # Circuit Health Verdict Banner
+            if d_nom <= 0.65:
+                st.success(f"### 🟢 CIRCUIT STATUS: WORKING PROPERLY (HEALTH SCORE: {health_score}%)")
+                st.write(
+                    "**Overall Verdict: PASS.** The circuit is operating normally! "
+                    "Node A voltage, Node B voltage, and total source current match Kirchhoff's laws within nominal ±5% manufacturing tolerances."
+                )
+            elif d_nom <= 1.85:
+                st.warning(f"### 🟡 CIRCUIT STATUS: DEGRADED / TOLERANCE WARNING (HEALTH SCORE: {health_score}%)")
+                st.write(
+                    "**Overall Verdict: WARNING.** The circuit is energized and conducting, but component degradation or significant thermal drift "
+                    "has shifted potentials outside standard tolerance boundaries."
+                )
+            else:
+                st.error(f"### 🔴 CIRCUIT STATUS: FAULTY / DEFECTIVE (HEALTH SCORE: {health_score}%)")
+                st.write(
+                    "**Overall Verdict: FAIL.** A critical circuit failure was detected! "
+                    "A catastrophic open-circuit or short-circuit is preventing normal electrical operation."
+                )
+
+            st.progress(health_score / 100.0)
+
+            # Summary Metrics Row
+            res_col1, res_col2, res_col3, res_col4 = st.columns(4)
+            with res_col1:
+                st.metric("Diagnosed State", f"{diag['predicted_code']}: {diag['predicted_name']}")
+            with res_col2:
+                st.metric("Health Index", f"{health_score} / 100")
+            with res_col3:
+                st.metric("Separation Margin (Δd)", f"{diag['margin']:.4f}", help="Margin to 2nd closest candidate")
+            with res_col4:
+                if diag['is_uncertain']:
+                    st.error("⚠️ Borderline State")
+                else:
+                    st.success("✅ High Confidence")
+
+            # Doctor's Actionable Prescription / Repair Guidance
+            prescriptions = {
+                'F0': "✅ **Doctor's Note:** All 4 resistors and connections are healthy. No maintenance required.",
+                'F1': "🔧 **Doctor's Prescription:** Resistor R1 is **OPEN**. Check supply wire connection and replace R1 with a standard 1.0 kΩ ±5% resistor.",
+                'F2': "🔧 **Doctor's Prescription:** Resistor R2 is **OPEN**. Node A shunt path is disconnected. Replace R2 with a standard 2.0 kΩ resistor.",
+                'F3': "🔧 **Doctor's Prescription:** Resistor R3 is **OPEN**. Bridge between Node A and B is broken. Replace R3 with a standard 1.5 kΩ resistor.",
+                'F4': "🔧 **Doctor's Prescription:** Resistor R4 is **OPEN**. Lower shunt path to Ground is severed. Replace R4 with a standard 3.0 kΩ resistor.",
+                'F5': "⚠️ **Doctor's Prescription:** Resistor R1 is **SHORTED**. Node A is clamped to the +10V rail. Remove solder bridge or copper whisker across R1.",
+                'F6': "🚨 **Doctor's Prescription:** Resistor R2 is **SHORTED to Ground**. 10 mA surge current is flowing through R1! Remove short across R2 immediately.",
+                'F7': "⚠️ **Doctor's Prescription:** Resistor R3 is **SHORTED**. Nodes A and B are directly connected. Remove solder bridge across R3.",
+                'F8': "⚠️ **Doctor's Prescription:** Resistor R4 is **SHORTED to Ground**. Node B is clamped to 0V. Remove short to Ground across R4.",
+                'F9': "🔍 **Doctor's Prescription:** Resistor R1 has drifted UP (+50% / 1.5 kΩ). Component has heat-aged. Replace with fresh 1.0 kΩ ±5% resistor.",
+                'F10': "🔍 **Doctor's Prescription:** Resistor R2 has drifted UP (+50% / 3.0 kΩ). Replace R2 with fresh 2.0 kΩ ±5% resistor.",
+                'F11': "🔍 **Doctor's Prescription:** Resistor R3 has drifted DOWN (-50% / 0.75 kΩ). Replace R3 with fresh 1.5 kΩ ±5% resistor.",
+                'F12': "🔍 **Doctor's Prescription:** Resistor R4 has drifted DOWN (-50% / 1.5 kΩ). Replace R4 with fresh 3.0 kΩ ±5% resistor."
+            }
+            prescription_text = prescriptions.get(diag['predicted_code'], "Measure individual resistors with an ohmmeter to locate deviation.")
+            st.info(f"💊 **Doctor's Repair Prescription:**\n{prescription_text}")
             st.caption(f"Input Data Tag: **{data_source_label}**")
 
             res_col1, res_col2, res_col3, res_col4 = st.columns(4)
@@ -392,7 +596,16 @@ def run_streamlit_app():
         nom_txt = generate_falstad_circuit_text(10.0, 1000.0, 2000.0, 1500.0, 3000.0, "Nominal DC Resistor Network")
         nom_url = get_falstad_simulator_url(nom_txt)
 
-        st.link_button("🌐 Open Circuit Directly in Falstad Simulator", nom_url, type="primary")
+        col_f1, col_f2 = st.columns([1, 1])
+        with col_f1:
+            st.link_button("🌐 Open in Dedicated Falstad Window", nom_url, type="primary")
+        with col_f2:
+            st.caption("You can interact with the live schematic below: double-click any component to change its value, add wires, or simulate open/shorts in real time!")
+
+        st.components.v1.html(
+            f'<iframe src="{nom_url}" width="100%" height="520" style="border: 2px solid #2B6CB0; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);"></iframe>',
+            height=540
+        )
 
         st.markdown("### Falstad Validation Experiment Table")
         falstad_csv_path = os.path.join(os.path.dirname(__file__), 'data', 'falstad_experiment_log.csv')
