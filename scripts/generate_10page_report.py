@@ -402,7 +402,8 @@ def create_10page_report(output_path: str):
     add_h2("5. Software Implementation Tools")
     add_body(
         "The software was implemented in Python 3.14 using NumPy, Pandas, Scikit-Learn, and Matplotlib. Dual interfaces were created: "
-        "an interactive web application in Streamlit (`app.py`) and a 100% offline desktop application in Tkinter (`gui_tk.py`)."
+        "an interactive web application in Streamlit (`app.py`, featuring 8 dedicated tabs including physical breadboard wiring, fault topologies, "
+        "and 3D feature space clustering) and a 100% offline desktop application in Tkinter (`gui_tk.py`)."
     )
 
     doc.add_page_break()

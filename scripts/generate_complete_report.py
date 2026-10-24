@@ -1240,11 +1240,18 @@ def build_full_report(output_path: str):
 
     add_h2("5.11 Graphical User Interfaces")
     add_body(
-        "To provide maximum demonstration flexibility for academic presentations, two independent graphical user interfaces were implemented:\n"
-        "1. Streamlit Interactive Web Application (`app.py`): Run via `streamlit run app.py`. Features 5 interactive tabs: Live Circuit Telemetry & Fault Injection, "
-        "Manual Multimeter Diagnostic Mode, Falstad SPICE Verification with 1-click links, Supervised Online Self-Learning Lab Ingestion, and Complete BEEE Electrical Theory.\n"
+        "To provide maximum demonstration flexibility for academic presentations and laboratory sessions, two independent graphical user interfaces were implemented:\n"
+        "1. Streamlit Interactive Web Application (`app.py`): Run via `streamlit run app.py`. Features 8 comprehensive interactive tabs:\n"
+        "   • Tab 1 (🩺 Live Circuit Diagnosis): Interactive simulation slider controls, fault injection catalog, DMM measurement telemetry, and real-time dual-method diagnostic inference (Nearest-Centroid and Baseline Thresholds) with separation margin confidence scoring.\n"
+        "   • Tab 2 (🔌 Physical Breadboard & Lab Wiring): Visual bench implementation on an 830-tie-point solderless breadboard, EIA 4-band resistor color codes (R1: Brown-Black-Red-Gold, R2: Red-Black-Red-Gold, R3: Brown-Green-Red-Gold, R4: Orange-Black-Red-Gold), and DMM probing rules.\n"
+        "   • Tab 3 (🔬 Fault Topologies & Ambiguity Resolution): 4 physical equivalent circuit topologies showing failure physics, and an in-depth breakdown of how current sensing disambiguates the R1 Open vs R2 Short equipotential tie.\n"
+        "   • Tab 4 (🌐 3D Signature Feature Space): Three-dimensional scatter visualization [VA, VB, Is] demonstrating class cluster separation, tolerance dispersion ellipsoids, and the ambiguity resolution vector.\n"
+        "   • Tab 5 (📊 Experimental Evaluation): Full evaluation dashboard presenting the 100% confusion matrix, baseline threshold comparisons, and parametric tolerance/noise sensitivity sweep curves.\n"
+        "   • Tab 6 (⚡ Falstad Simulator Cross-Check): Direct one-click online Falstad circuit links, ASCII circuit netlists, and the verified 13-class SPICE cross-validation log.\n"
+        "   • Tab 7 (🧠 Supervised Self-Learning): Live ingestion interface enabling operators to submit verified lab readings and witness incremental streaming centroid updates without retraining.\n"
+        "   • Tab 8 (📖 BEEE Electrical Theory): Complete step-by-step KCL nodal equation derivations, matrix conductance solver formulations, and nominal value mathematical proofs.\n"
         "2. Tkinter Zero-Dependency Desktop Application (`gui_tk.py`): Run via `python gui_tk.py`. A 100% offline desktop GUI built entirely using Python's standard library, "
-        "requiring zero third-party web packages, making it universally runnable in restrictive university laboratory environments."
+        "requiring zero third-party web packages, making it universally runnable in air-gapped or restrictive university laboratory environments."
     )
 
     add_h2("5.12 Software Dependencies and Platform Compatibility")
@@ -1558,7 +1565,7 @@ def build_full_report(output_path: str):
 
     add_h2("7.11 Demonstration of Live Supervised Incremental Self-Learning")
     add_body(
-        "In Tab 4 of our Streamlit application and in unit test `test_incremental_self_learning_update`, we validated the supervised online learning engine. "
+        "In Tab 7 (Supervised Self-Learning) of our Streamlit application and in unit test `test_incremental_self_learning_update`, we validated the supervised online learning engine. "
         "When an operator submits a verified lab measurement (e.g., VA = 5.82 V, VB = 3.88 V, Is = 4.20 mA for Normal), the system recalculates the class centroid "
         "using the streaming average formula. The sample count incremented from 120 to 121, shifting the standardized centroid by 0.0031 units without retraining "
         "the model or altering other class clusters."
