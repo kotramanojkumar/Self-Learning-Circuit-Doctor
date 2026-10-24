@@ -114,6 +114,7 @@ $$\frac{V_B - V_A}{R_3} + \frac{V_B}{R_4} = 0 \implies V_B = V_A \left( \frac{R_
 │   ├── generate_10page_report.py    # Builds concise 10-page Word report
 │   ├── generate_complete_report.py  # Builds comprehensive 23-section master report
 │   ├── generate_diagrams.py         # Generates architecture & flowchart diagrams
+│   ├── generate_advanced_diagrams.py # Builds breadboard wiring, fault physics & 3D cluster visuals
 │   ├── generate_presentation.py     # Builds 16-slide widescreen PowerPoint presentation
 │   └── export_pdf.ps1               # Word/PPT COM PDF automated export script
 ├── data/                      # Synthetic CSV datasets & Falstad experiment log
@@ -125,6 +126,9 @@ $$\frac{V_B - V_A}{R_3} + \frac{V_B}{R_4} = 0 \implies V_B = V_A \left( \frac{R_
 │   └── evaluation_summary.txt
 ├── figures/                   # High-resolution 300 DPI figures
 │   ├── circuit_schematic.png
+│   ├── breadboard_wiring_diagram.png     # Solderless breadboard layout with EIA color bands & DMMs
+│   ├── fault_mechanism_diagrams.png      # 4 physical topologies (Normal, R1 Open, R2 Short, R4 Open)
+│   ├── 3d_signature_clusters.png         # 3D scatter plot of 13 classes & tolerance ellipsoids
 │   ├── system_architecture.png
 │   ├── diagnostic_flowchart.png
 │   ├── voltage_signatures_comparison.png

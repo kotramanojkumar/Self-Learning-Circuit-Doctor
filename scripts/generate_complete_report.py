@@ -547,14 +547,17 @@ def build_full_report(output_path: str):
     # =========================================================================
     add_h2("List of Figures")
     figures_list = [
-        ("Figure 1", "Four-Resistor DC Bridge/Ladder Network Schematic with Measured Test Nodes"),
-        ("Figure 2", "End-to-End Diagnostic System Architecture (Circuit Engine, Sensing, ML Core, Deployment)"),
-        ("Figure 3", "Fault Diagnosis and Classification Decision Flowchart with Separation Margin Check"),
-        ("Figure 4", "Multi-Signal Voltage and Current Signatures across 13 Distinct Operating States"),
-        ("Figure 5", "Confusion Matrix of the Proposed Standardized Nearest-Centroid Classifier (100% Accuracy)"),
-        ("Figure 6", "Confusion Matrix of the Baseline Rule-Based Threshold Detector (Ambiguity Failures)"),
-        ("Figure 7", "Diagnostic Accuracy vs Resistor Manufacturing Tolerance (1% to 15% Tolerance Sweep)"),
-        ("Figure 8", "Diagnostic Accuracy vs Sensor Measurement Noise (10 mV to 200 mV Voltage Noise Sweep)")
+        ("Figure 4.1", "Schematic of the Four-Resistor DC Bridge-Ladder Network with Test Nodes"),
+        ("Figure 4.2", "Realistic Solderless Breadboard Wiring Layout with EIA 4-Band Color Codes and DMM Probing Points"),
+        ("Figure 4.3", "Physical Equivalent Topologies and Failure Mechanisms across Key Circuit Fault States"),
+        ("Figure 5.1", "High-Level End-to-End Diagnostic Software and System Architecture"),
+        ("Figure 5.2", "Operational Fault Diagnosis and Classification Flowchart with Separation Margin Verification"),
+        ("Figure 7.1", "Multi-Signal Voltage and Current Signatures across 13 Distinct Operating States"),
+        ("Figure 7.2", "Three-Dimensional Feature Space Visualization [VA, VB, Is] Depicting 13 Well-Separated Clusters"),
+        ("Figure 7.3", "Confusion Matrix of the Proposed Standardized Nearest-Centroid Classifier (100% Accuracy)"),
+        ("Figure 7.4", "Confusion Matrix of the Baseline Rule-Based Threshold Detector (Ambiguity Failures)"),
+        ("Figure 7.5", "Diagnostic Accuracy vs Resistor Manufacturing Tolerance (1% to 15% Tolerance Sweep)"),
+        ("Figure 7.6", "Diagnostic Accuracy vs Sensor Measurement Noise (10 mV to 200 mV Voltage Noise Sweep)")
     ]
     for fig_no, fig_title in figures_list:
         add_bullet(f"{fig_no}: {fig_title}")
@@ -957,6 +960,16 @@ def build_full_report(output_path: str):
     r_scap.font.italic = True
     r_scap.font.color.rgb = MUTED
 
+    add_body(
+        "Figure 4.2 illustrates the realistic solderless breadboard wiring layout for hands-on bench verification. It details the physical "
+        "tie-point routing on an 830-tie-point solderless breadboard, standard EIA 4-band resistor color codes (R1: Brown-Black-Red-Gold, "
+        "R2: Red-Black-Red-Gold, R3: Brown-Green-Red-Gold, R4: Orange-Black-Red-Gold), and connection terminals for the three Digital "
+        "Multimeters (DMM1 in series with the positive rail for source current Is, DMM2 across Node A to Ground for VA, and DMM3 across "
+        "Node B to Ground for VB)."
+    )
+
+    add_figure("breadboard_wiring_diagram.png", "Figure 4.2: Realistic solderless breadboard wiring layout with EIA 4-band resistor color codes and digital multimeter (DMM) test probing points.")
+
     add_h2("4.3 Fundamental Electrical Laws in DC Circuits")
     add_body(
         "To ensure that this report remains accessible and pedagogical for undergraduate engineering students, we review the fundamental linear laws governing this circuit:"
@@ -1039,6 +1052,14 @@ def build_full_report(output_path: str):
         "We model four representative parametric drift states: R1 increased by 50% (1.5 kΩ), R2 increased by 50% (3.0 kΩ), R3 decreased by 50% (0.75 kΩ), "
         "and R4 decreased by 50% (1.5 kΩ)."
     )
+
+    add_body(
+        "Figure 4.3 illustrates the physical equivalent topologies and failure physics for four key operating conditions: Normal Operation, "
+        "R1 Open (complete supply disconnection and total power loss), R2 Short (catastrophic 10 mA current surge with both nodes clamped to ground), "
+        "and R4 Open (equipotential state where Node B is pulled up to Node A potential due to zero current flow in R3)."
+    )
+
+    add_figure("fault_mechanism_diagrams.png", "Figure 4.3: Physical equivalent circuit topologies and failure mechanisms across key circuit fault states.")
 
     add_h2("4.6 Theoretical Measurement Trajectories across All 13 Modes")
     add_body(
@@ -1410,6 +1431,15 @@ def build_full_report(output_path: str):
 
     add_figure("voltage_signatures_comparison.png", "Figure 7.1: Multi-signal voltage and current signature comparison across all 13 circuit operating conditions.")
 
+    add_body(
+        "Figure 7.2 visualizes the complete three-dimensional signature feature space [VA, VB, Is]. Each of the 13 operating modes forms a distinct, "
+        "compact cluster enveloped by its empirical tolerance ellipsoid, confirming that linear DC network physics maps discrete component faults into "
+        "linearly separable geometric regions. Crucially, the 3D projection reveals the exact spatial separation between R1 Open (0 V, 0 V, 0 mA) and "
+        "R2 Short (0 V, 0 V, 10 mA) along the vertical current axis, rendering the equipotential ambiguity completely resolvable."
+    )
+
+    add_figure("3d_signature_clusters.png", "Figure 7.2: Three-dimensional feature space visualization [VA, VB, Is] demonstrating class cluster separation, tolerance dispersion ellipsoids, and the ambiguity resolution vector.")
+
     add_h2("7.3 Overall Diagnostic Performance Comparison")
     add_body(
         "Across the 390 held-out test cases, the Proposed Standardized Nearest-Centroid Classifier (Method B) achieved 100.00% diagnostic accuracy "
@@ -1477,13 +1507,13 @@ def build_full_report(output_path: str):
 
     add_h2("7.5 Confusion Matrix Analysis and Diagonal Dominance")
     add_body(
-        "Figure 7.2 displays the confusion matrix for the Proposed Standardized Nearest-Centroid Classifier, and Figure 7.3 displays "
+        "Figure 7.3 displays the confusion matrix for the Proposed Standardized Nearest-Centroid Classifier, and Figure 7.4 displays "
         "the confusion matrix for the Baseline Threshold Detector. The classifier matrix exhibits pure diagonal dominance: all 390 test "
         "samples fall exactly along the principal diagonal with exactly 30 correct predictions per class and zero off-diagonal misclassifications."
     )
 
-    add_figure("confusion_matrix_classifier.png", "Figure 7.2: Confusion matrix of the Proposed Standardized Nearest-Centroid Classifier (390 test samples).")
-    add_figure("confusion_matrix_baseline.png", "Figure 7.3: Confusion matrix of the Baseline Rule-Based Threshold Detector.")
+    add_figure("confusion_matrix_classifier.png", "Figure 7.3: Confusion matrix of the Proposed Standardized Nearest-Centroid Classifier (390 test samples).")
+    add_figure("confusion_matrix_baseline.png", "Figure 7.4: Confusion matrix of the Baseline Rule-Based Threshold Detector.")
 
     add_h2("7.6 Ambiguity Resolution: How Current Sensing Disambiguates R1 Open vs R2 Short")
     add_body(
@@ -1491,6 +1521,7 @@ def build_full_report(output_path: str):
         "and Node B measure exactly 0.000 V. In conventional voltage-only diagnostic systems, this creates an unresolvable tie. However, when source current "
         "Is is incorporated into the signature, the physical reality is immediately apparent: for R1 Open, the circuit is completely disconnected, resulting "
         "in Is = 0.0 mA. For R2 Short, the supply voltage is dropped entirely across R1, causing a surge current of Is = 10.0 mA. "
+        "As clearly highlighted by the ambiguity resolution arrow in the 3D feature space (Figure 7.2), these two states diverge along the Is axis by a full 10.0 mA. "
         "In our standardized feature space, these two conditions are separated by a standardized Euclidean distance of d = 2.68 units, proving that multi-signal "
         "sensing completely resolves equipotential ambiguity."
     )
@@ -1505,20 +1536,20 @@ def build_full_report(output_path: str):
     add_h2("7.8 Robustness Analysis: Resistor Manufacturing Tolerance Sensitivity")
     add_body(
         "To test the boundaries of diagnostic robustness, we swept resistor manufacturing tolerances from 1% up to 15% in increments of 1% (150 samples per class "
-        "at each step). Figure 7.4 plots the resulting accuracy curve. The Standardized Nearest-Centroid Classifier maintains 100% accuracy from 1% through 7% tolerance, "
+        "at each step). Figure 7.5 plots the resulting accuracy curve. The Standardized Nearest-Centroid Classifier maintains 100% accuracy from 1% through 7% tolerance, "
         "and remains above 97.4% accuracy even at extreme 15% tolerances. In contrast, the baseline threshold detector begins degrading rapidly past 5% tolerance "
         "as component variations cause signatures to spill outside rigid threshold boundaries."
     )
 
-    add_figure("tolerance_sensitivity_curve.png", "Figure 7.4: Diagnostic accuracy vs resistor manufacturing tolerance (1% to 15% tolerance sweep).")
+    add_figure("tolerance_sensitivity_curve.png", "Figure 7.5: Diagnostic accuracy vs resistor manufacturing tolerance (1% to 15% tolerance sweep).")
 
     add_h2("7.9 Robustness Analysis: Sensor Measurement Noise Sensitivity")
     add_body(
-        "We similarly evaluated sensor noise robustness by sweeping multimeter voltage noise from 10 mV up to 200 mV RMS. Figure 7.5 plots the resulting curve. "
+        "We similarly evaluated sensor noise robustness by sweeping multimeter voltage noise from 10 mV up to 200 mV RMS. Figure 7.6 plots the resulting curve. "
         "The classifier maintains 100% accuracy across standard DMM noise levels (10 mV to 50 mV) and stays above 96.8% accuracy even under severe 200 mV noise levels."
     )
 
-    add_figure("noise_sensitivity_curve.png", "Figure 7.5: Diagnostic accuracy vs multimeter sensor measurement noise (10 mV to 200 mV voltage noise sweep).")
+    add_figure("noise_sensitivity_curve.png", "Figure 7.6: Diagnostic accuracy vs multimeter sensor measurement noise (10 mV to 200 mV voltage noise sweep).")
 
     add_h2("7.10 Edge Cases, Borderline Diagnoses, and Diagnostic Uncertainty Flagging")
     add_body(
@@ -1788,12 +1819,6 @@ def build_full_report(output_path: str):
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     doc.save(output_path)
     print(f"Report DOCX saved successfully to: {output_path}")
-
-    # Also synchronize to secondary filename if distinct
-    alt_path = os.path.join(os.path.dirname(output_path), 'Circuit_Doctor_Project_Report.docx')
-    if os.path.abspath(output_path) != os.path.abspath(alt_path):
-        shutil.copyfile(output_path, alt_path)
-        print(f"Report DOCX also synchronized to: {alt_path}")
 
 
 if __name__ == '__main__':

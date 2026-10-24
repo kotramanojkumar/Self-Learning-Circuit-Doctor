@@ -54,6 +54,9 @@ def run_streamlit_app():
         "Navigation Menu",
         [
             "🩺 Live Circuit Diagnosis",
+            "🔌 Physical Breadboard & Lab Wiring",
+            "🔬 Fault Topologies & Ambiguity Resolution",
+            "🌐 3D Signature Feature Space",
             "📊 Experimental Evaluation",
             "⚡ Falstad Simulator Cross-Check",
             "🧠 Supervised Self-Learning",
@@ -216,7 +219,102 @@ def run_streamlit_app():
             plt.close()
 
     # =========================================================================
-    # TAB 2: EXPERIMENTAL EVALUATION
+    # TAB 2: PHYSICAL BREADBOARD & LAB WIRING GUIDE
+    # =========================================================================
+    elif nav_choice == "🔌 Physical Breadboard & Lab Wiring":
+        st.title("🔌 Physical Hardware Breadboard & Test-Point Wiring Guide")
+        st.write(
+            "This guide shows how the four-resistor DC ladder network is physically wired on a standard "
+            "solderless breadboard, complete with resistor EIA color codes, power supply connections, and DMM probe placement."
+        )
+
+        fig_dir = os.path.join(os.path.dirname(__file__), 'figures')
+        bb_path = os.path.join(fig_dir, 'breadboard_wiring_diagram.png')
+        if os.path.exists(bb_path):
+            st.image(bb_path, use_container_width=True)
+
+        col_bb1, col_bb2 = st.columns(2)
+        with col_bb1:
+            st.subheader("Resistor Color Code Reference Table")
+            st.markdown("""
+            | Resistor | Value | Tolerance | 4-Band Color Code |
+            | :--- | :--- | :--- | :--- |
+            | **R1** | $1.0\\text{ k}\\Omega$ | $\\pm 5\\%$ | 🟫 Brown, ⬛ Black, 🟥 Red, 🟨 Gold |
+            | **R2** | $2.0\\text{ k}\\Omega$ | $\\pm 5\\%$ | 🟥 Red, ⬛ Black, 🟥 Red, 🟨 Gold |
+            | **R3** | $1.5\\text{ k}\\Omega$ | $\\pm 5\\%$ | 🟫 Brown, 🟩 Green, 🟥 Red, 🟨 Gold |
+            | **R4** | $3.0\\text{ k}\\Omega$ | $\\pm 5\\%$ | 🟧 Orange, ⬛ Black, 🟥 Red, 🟨 Gold |
+            """)
+
+        with col_bb2:
+            st.subheader("Digital Multimeter (DMM) Probing Rules")
+            st.markdown("""
+            - **DMM 1 (Ammeter for Is):** Connect in **series** between the $+10\\text{ V}$ positive supply rail and resistor $R_1$. (Set selector to `20 mA DC`).
+            - **DMM 2 (Voltmeter for VA):** Connect Red probe to **Node A** (junction of $R_1, R_2, R_3$) and Black probe to **Ground (0V)**. (Set to `20 V DC`).
+            - **DMM 3 (Voltmeter for VB):** Connect Red probe to **Node B** (junction of $R_3, R_4$) and Black probe to **Ground (0V)**. (Set to `20 V DC`).
+            - **Common Ground Rationale:** All voltages are referenced to a single common 0V ground rail, minimizing probe complexity and mirroring industrial ground planes.
+            """)
+
+    # =========================================================================
+    # TAB 3: FAULT TOPOLOGIES & AMBIGUITY RESOLUTION
+    # =========================================================================
+    elif nav_choice == "🔬 Fault Topologies & Ambiguity Resolution":
+        st.title("🔬 Circuit Topologies & Physical Failure Physics")
+        st.write(
+            "Visual comparison of the circuit's physical behavior under healthy operation versus characteristic "
+            "catastrophic failure modes, illustrating how source current breaks diagnostic deadlocks."
+        )
+
+        fig_dir = os.path.join(os.path.dirname(__file__), 'figures')
+        fm_path = os.path.join(fig_dir, 'fault_mechanism_diagrams.png')
+        if os.path.exists(fm_path):
+            st.image(fm_path, use_container_width=True)
+
+        st.markdown("---")
+        st.subheader("★ The Critical Ambiguity Resolution: R1 Open vs R2 Short")
+        col_am1, col_am2 = st.columns(2)
+        with col_am1:
+            st.error("❌ Voltage-Only Monitoring Fails:")
+            st.markdown("""
+            - **R1 Open (F1):** The circuit is disconnected. Multimeters read:
+              - $V_A = 0.000\\text{ V}$
+              - $V_B = 0.000\\text{ V}$
+            - **R2 Short (F6):** Node A is shorted to Ground. Multimeters read:
+              - $V_A = 0.000\\text{ V}$
+              - $V_B = 0.000\\text{ V}$
+            - **Result:** Identical voltages! A voltage-only detector experiences 100% ambiguity.
+            """)
+
+        with col_am2:
+            st.success("✅ Multi-Signal Sensing Resolves Tie:")
+            st.markdown("""
+            - **R1 Open (F1):** $I_s = \\mathbf{0.000\\text{ mA}}$ (open loop, zero power).
+            - **R2 Short (F6):** Full $10\\text{ V}$ drops across $R_1$, causing $I_s = \\mathbf{10.000\\text{ mA}}$!
+            - **Result:** In standardized 3D space, these two states are separated by an immense **$d = 2.68$ units**, completely eliminating misclassification!
+            """)
+
+    # =========================================================================
+    # TAB 4: 3D SIGNATURE FEATURE SPACE
+    # =========================================================================
+    elif nav_choice == "🌐 3D Signature Feature Space":
+        st.title("🌐 3D Geometric Feature Space [VA, VB, Is]")
+        st.write(
+            "Every physical state in the DC network maps to a distinct cluster in the 3-dimensional "
+            "measurement space $[V_A, V_B, I_s]$. The Nearest-Centroid Classifier evaluates Euclidean distances to each cluster centroid."
+        )
+
+        fig_dir = os.path.join(os.path.dirname(__file__), 'figures')
+        clus_path = os.path.join(fig_dir, '3d_signature_clusters.png')
+        if os.path.exists(clus_path):
+            st.image(clus_path, use_container_width=True)
+
+        st.info(
+            "**Key Geometric Insight:** The stars mark the reference class centroids computed from training samples. "
+            "The spread of dots around each star reflects natural $\\pm 5\\%$ resistor manufacturing tolerances and sensor noise. "
+            "Because the clusters are well-separated in 3D, the Standardized Nearest-Centroid Classifier achieves 100% test accuracy."
+        )
+
+    # =========================================================================
+    # TAB 5: EXPERIMENTAL EVALUATION
     # =========================================================================
     elif nav_choice == "📊 Experimental Evaluation":
         st.title("📊 Rigorous Experimental Evaluation & Metrics")
