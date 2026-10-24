@@ -239,18 +239,18 @@ def run_streamlit_app():
             st.markdown("""
             | Resistor | Value | Tolerance | 4-Band Color Code |
             | :--- | :--- | :--- | :--- |
-            | **R1** | $1.0\\text{ k}\\Omega$ | $\\pm 5\\%$ | 🟫 Brown, ⬛ Black, 🟥 Red, 🟨 Gold |
-            | **R2** | $2.0\\text{ k}\\Omega$ | $\\pm 5\\%$ | 🟥 Red, ⬛ Black, 🟥 Red, 🟨 Gold |
-            | **R3** | $1.5\\text{ k}\\Omega$ | $\\pm 5\\%$ | 🟫 Brown, 🟩 Green, 🟥 Red, 🟨 Gold |
-            | **R4** | $3.0\\text{ k}\\Omega$ | $\\pm 5\\%$ | 🟧 Orange, ⬛ Black, 🟥 Red, 🟨 Gold |
+            | **R1** | 1.0 kΩ | ±5% | 🟫 Brown, ⬛ Black, 🟥 Red, 🟨 Gold |
+            | **R2** | 2.0 kΩ | ±5% | 🟥 Red, ⬛ Black, 🟥 Red, 🟨 Gold |
+            | **R3** | 1.5 kΩ | ±5% | 🟫 Brown, 🟩 Green, 🟥 Red, 🟨 Gold |
+            | **R4** | 3.0 kΩ | ±5% | 🟧 Orange, ⬛ Black, 🟥 Red, 🟨 Gold |
             """)
 
         with col_bb2:
             st.subheader("Digital Multimeter (DMM) Probing Rules")
             st.markdown("""
-            - **DMM 1 (Ammeter for Is):** Connect in **series** between the $+10\\text{ V}$ positive supply rail and resistor $R_1$. (Set selector to `20 mA DC`).
-            - **DMM 2 (Voltmeter for VA):** Connect Red probe to **Node A** (junction of $R_1, R_2, R_3$) and Black probe to **Ground (0V)**. (Set to `20 V DC`).
-            - **DMM 3 (Voltmeter for VB):** Connect Red probe to **Node B** (junction of $R_3, R_4$) and Black probe to **Ground (0V)**. (Set to `20 V DC`).
+            - **DMM 1 (Ammeter for Is):** Connect in **series** between the +10V positive supply rail and resistor R1. (Set selector to `20 mA DC`).
+            - **DMM 2 (Voltmeter for VA):** Connect Red probe to **Node A** (junction of R1, R2, R3) and Black probe to **Ground (0V)**. (Set to `20 V DC`).
+            - **DMM 3 (Voltmeter for VB):** Connect Red probe to **Node B** (junction of R3, R4) and Black probe to **Ground (0V)**. (Set to `20 V DC`).
             - **Common Ground Rationale:** All voltages are referenced to a single common 0V ground rail, minimizing probe complexity and mirroring industrial ground planes.
             """)
 
@@ -275,10 +275,10 @@ def run_streamlit_app():
         with col_am1:
             st.error("❌ Voltage-Only Monitoring Fails:")
             st.markdown("""
-            - **R1 Open (F1):** The circuit is disconnected. Multimeters read:
+            - **R1 Open (F1):** Circuit is disconnected. DMM probes read:
               - $V_A = 0.000\\text{ V}$
               - $V_B = 0.000\\text{ V}$
-            - **R2 Short (F6):** Node A is shorted to Ground. Multimeters read:
+            - **R2 Short (F6):** Node A is shorted to Ground. DMM probes read:
               - $V_A = 0.000\\text{ V}$
               - $V_B = 0.000\\text{ V}$
             - **Result:** Identical voltages! A voltage-only detector experiences 100% ambiguity.
@@ -287,9 +287,9 @@ def run_streamlit_app():
         with col_am2:
             st.success("✅ Multi-Signal Sensing Resolves Tie:")
             st.markdown("""
-            - **R1 Open (F1):** $I_s = \\mathbf{0.000\\text{ mA}}$ (open loop, zero power).
-            - **R2 Short (F6):** Full $10\\text{ V}$ drops across $R_1$, causing $I_s = \\mathbf{10.000\\text{ mA}}$!
-            - **Result:** In standardized 3D space, these two states are separated by an immense **$d = 2.68$ units**, completely eliminating misclassification!
+            - **R1 Open (F1):** $I_s = 0.000\\text{ mA}$ (open loop, zero power dissipation).
+            - **R2 Short (F6):** Full 10V drops across $R_1$, causing $I_s = 10.000\\text{ mA}$!
+            - **Result:** In standardized 3D feature space, these two states are separated by an immense **$d = 2.68$ units**, completely eliminating misclassification!
             """)
 
     # =========================================================================
@@ -418,11 +418,9 @@ def run_streamlit_app():
             "updates its reference centroid without discarding prior knowledge."
         )
 
-        st.info(
-            "**Incremental Online Formulation:**\n\n"
-            r"$N_{c, new} = N_{c, old} + 1$" + "\n\n"
-            r"$\mathbf{C}_{c, new} = \mathbf{C}_{c, old} + \frac{1}{N_{c, new}} (\mathbf{z}_{new} - \mathbf{C}_{c, old})$"
-        )
+        st.info("💡 **Incremental Online Formulation:**")
+        st.latex(r"N_{c, \text{new}} = N_{c, \text{old}} + 1")
+        st.latex(r"\mathbf{C}_{c, \text{new}} = \mathbf{C}_{c, \text{old}} + \frac{1}{N_{c, \text{new}}} \left( \mathbf{z}_{\text{new}} - \mathbf{C}_{c, \text{old}} \right)")
 
         col_l1, col_l2 = st.columns([1, 1])
         with col_l1:
@@ -451,38 +449,72 @@ def run_streamlit_app():
             """)
 
     # =========================================================================
-    # TAB 5: BEEE ELECTRICAL THEORY
+    # TAB 8: BEEE ELECTRICAL THEORY
     # =========================================================================
     elif nav_choice == "📖 BEEE Electrical Theory":
         st.title("📖 BEEE Electrical Circuit Theory")
-        st.write("Complete nodal derivations and Kirchhoff's Laws governing the circuit.")
+        st.write("Complete step-by-step nodal derivations and Kirchhoff's Laws governing the four-resistor DC network.")
 
-        st.markdown(r"""
-        ### 1. Kirchhoff's Current Law (KCL) Formulation
-        At Node A:
-        $$\frac{V_A - V_s}{R_1} + \frac{V_A}{R_2} + \frac{V_A - V_B}{R_3} = 0$$
-        
-        At Node B:
-        $$\frac{V_B - V_A}{R_3} + \frac{V_B}{R_4} = 0 \implies V_B = V_A \left( \frac{R_4}{R_3 + R_4} \right)$$
-        
-        ### 2. Matrix Conductance Form ($\mathbf{G}\mathbf{V} = \mathbf{I}$)
-        $$\begin{bmatrix}
-        \frac{1}{R_1} + \frac{1}{R_2} + \frac{1}{R_3} & -\frac{1}{R_3} \\
+        st.subheader("1. Kirchhoff's Current Law (KCL) Formulation")
+        st.markdown(
+            "According to KCL, electric charge is conserved, so the algebraic sum of currents "
+            "entering or leaving any circuit node must equal zero:"
+        )
+        st.write("**Nodal Equation at Node A:**")
+        st.latex(r"\frac{V_A - V_s}{R_1} + \frac{V_A}{R_2} + \frac{V_A - V_B}{R_3} = 0")
+
+        st.write("**Nodal Equation at Node B:**")
+        st.latex(r"\frac{V_B - V_A}{R_3} + \frac{V_B}{R_4} = 0 \implies V_B = V_A \left( \frac{R_4}{R_3 + R_4} \right)")
+
+        st.subheader("2. Matrix Conductance Form (G · V = I)")
+        st.markdown(
+            "Writing the coupled linear nodal equations in standard Modified Nodal Analysis (MNA) matrix conductance form:"
+        )
+        st.latex(r"""
+        \begin{bmatrix}
+        \frac{1}{R_1} + \frac{1}{R_2} + \frac{1}{R_3} & -\frac{1}{R_3} \\[8pt]
         -\frac{1}{R_3} & \frac{1}{R_3} + \frac{1}{R_4}
         \end{bmatrix}
-        \begin{bmatrix} V_A \\ V_B \end{bmatrix} =
-        \begin{bmatrix} \frac{V_s}{R_1} \\ 0 \end{bmatrix}$$
-        
-        ### 3. Nominal Reference Values (Vs = 10V, R1=1k, R2=2k, R3=1.5k, R4=3k)
-        - $R_{34} = R_3 + R_4 = 1.5 + 3.0 = 4.5\text{ k}\Omega$
-        - $R_p = R_2 \parallel R_{34} = \frac{2 \times 4.5}{2 + 4.5} = \frac{18}{13}\text{ k}\Omega \approx 1.3846\text{ k}\Omega$
-        - $R_{total} = R_1 + R_p = 1 + \frac{18}{13} = \frac{31}{13}\text{ k}\Omega \approx 2.3846\text{ k}\Omega$
-        - $I_s = \frac{V_s}{R_{total}} = \frac{10}{31/13} = \frac{130}{31}\text{ mA} \approx \mathbf{4.194\text{ mA}}$
-        - $V_A = V_s \frac{R_p}{R_1 + R_p} = 10 \frac{18/13}{31/13} = \frac{180}{31}\text{ V} \approx \mathbf{5.806\text{ V}}$
-        - $V_B = V_A \left( \frac{R_4}{R_3 + R_4} \right) = \frac{180}{31} \left( \frac{2}{3} \right) = \frac{120}{31}\text{ V} \approx \mathbf{3.871\text{ V}}$
+        \begin{bmatrix}
+        V_A \\[8pt]
+        V_B
+        \end{bmatrix}
+        =
+        \begin{bmatrix}
+        \frac{V_s}{R_1} \\[8pt]
+        0
+        \end{bmatrix}
         """)
 
-        st.markdown("### Summary of All 13 Operating Conditions")
+        st.subheader("3. Step-by-Step Nominal Calculations")
+        st.markdown(
+            "Under nominal circuit conditions with $V_s = 10\\text{ V}$, $R_1 = 1\\text{ k}\\Omega$, "
+            "$R_2 = 2\\text{ k}\\Omega$, $R_3 = 1.5\\text{ k}\\Omega$, and $R_4 = 3\\text{ k}\\Omega$:"
+        )
+
+        col_calc1, col_calc2 = st.columns(2)
+        with col_calc1:
+            st.markdown("**Equivalent series branch resistance ($R_{34}$):**")
+            st.latex(r"R_{34} = R_3 + R_4 = 1.5 + 3.0 = 4.5\text{ k}\Omega")
+
+            st.markdown(r"**Parallel combination ($R_p = R_2 \parallel R_{34}$):**")
+            st.latex(r"R_p = \frac{2 \times 4.5}{2 + 4.5} = \frac{18}{13}\text{ k}\Omega \approx 1.3846\text{ k}\Omega")
+
+            st.markdown("**Total circuit input resistance ($R_{\text{total}}$):**")
+            st.latex(r"R_{\text{total}} = R_1 + R_p = 1 + \frac{18}{13} = \frac{31}{13}\text{ k}\Omega \approx 2.3846\text{ k}\Omega")
+
+        with col_calc2:
+            st.markdown("**Total source current ($I_s$):**")
+            st.latex(r"I_s = \frac{V_s}{R_{\text{total}}} = \frac{10}{31/13} = \frac{130}{31}\text{ mA} \approx \mathbf{4.194\text{ mA}}")
+
+            st.markdown("**Node A potential ($V_A$):**")
+            st.latex(r"V_A = V_s \left(\frac{R_p}{R_1 + R_p}\right) = 10 \left(\frac{18/13}{31/13}\right) = \frac{180}{31}\text{ V} \approx \mathbf{5.806\text{ V}}")
+
+            st.markdown("**Node B potential ($V_B$):**")
+            st.latex(r"V_B = V_A \left( \frac{R_4}{R_3 + R_4} \right) = \frac{180}{31} \left( \frac{3.0}{4.5} \right) = \frac{120}{31}\text{ V} \approx \mathbf{3.871\text{ V}}")
+
+        st.markdown("---")
+        st.subheader("4. Summary of All 13 Operating Conditions")
         summary_table = get_fault_summary_table()
         import pandas as pd
         st.dataframe(pd.DataFrame(summary_table), use_container_width=True)
