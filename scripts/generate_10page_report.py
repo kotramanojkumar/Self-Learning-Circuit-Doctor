@@ -399,11 +399,11 @@ def create_10page_report(output_path: str):
         "    μ_new = (N_old · μ_old + Z_new) / (N_old + 1),   N_new = N_old + 1"
     )
 
-    add_h2("5. Software Implementation Tools")
+    add_h2("5. Software Architecture and Interactive Workbench")
     add_body(
-        "The software was implemented in Python 3.14 using NumPy, Pandas, Scikit-Learn, and Matplotlib. Dual interfaces were created: "
-        "an interactive web application in Streamlit (`app.py`, featuring 8 dedicated tabs including physical breadboard wiring, fault topologies, "
-        "and 3D feature space clustering) and a 100% offline desktop application in Tkinter (`gui_tk.py`)."
+        "The software was implemented in Python 3.14 across dual interfaces: (1) an interactive web platform in Streamlit (`app.py`, featuring 8 dedicated tabs "
+        "including a Virtual Circuit Workbench for custom component/source values, branch execution tables with energy balances, an interactive breadboard studio "
+        "with pin-by-pin continuity verification, live embedded Falstad schematic canvas, fault topologies, and 3D clustering) and (2) an offline desktop GUI in Tkinter (`gui_tk.py`)."
     )
 
     doc.add_page_break()
