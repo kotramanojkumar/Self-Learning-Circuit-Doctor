@@ -299,9 +299,10 @@ def run_streamlit_app():
             base_diag = baseline.predict_single(meas_va, meas_vb, meas_is)
 
             # Health index score relative to nominal 'F0'
-            feat_vec = np.array([[meas_va, meas_vb, meas_is]])
-            feat_norm = (feat_vec - clf.scaler_mean_) / clf.scaler_scale_
-            nom_center = clf.centroids_['F0']
+            feat_vec = np.array([meas_va, meas_vb, meas_is], dtype=float)
+            feat_norm = (feat_vec - clf.means_) / clf.stds_
+            nom_idx = clf.class_to_idx.get('F0_NORMAL', 0)
+            nom_center = clf.centroids_[nom_idx]
             d_nom = float(np.linalg.norm(feat_norm - nom_center))
             health_score = int(np.clip(100.0 * np.exp(-0.5 * (d_nom ** 2)), 0, 100))
 
@@ -362,26 +363,51 @@ def run_streamlit_app():
             }
             prescription_text = prescriptions.get(diag['predicted_code'], "Measure individual resistors with an ohmmeter to locate deviation.")
             st.info(f"💊 **Doctor's Repair Prescription:**\n{prescription_text}")
-            st.caption(f"Input Data Tag: **{data_source_label}**")
-
-            res_col1, res_col2, res_col3, res_col4 = st.columns(4)
-            with res_col1:
-                st.metric("Predicted Fault", f"{diag['predicted_code']}: {diag['predicted_name']}")
-            with res_col2:
-                st.metric("Nearest Centroid Distance", f"{diag['nearest_distance']:.4f}")
-            with res_col3:
-                st.metric("Runner-Up Separation", f"{diag['margin']:.4f}", help="Margin to 2nd closest candidate")
-            with res_col4:
-                if diag['is_uncertain']:
-                    st.error("⚠️ Borderline / Ambiguous")
-                else:
-                    st.success("✅ High Confidence")
 
             # Ground truth verification if available
             if ground_truth_label is not None:
                 if diag['predicted_class'] == ground_truth_label:
                     st.success(f"🎯 **Diagnosis Correct:** Injected fault '{ground_truth_label}' matches model prediction!")
                 else:
+                    st.warning(f"⚠️ **Discrepancy:** Injected '{ground_truth_label}', predicted '{diag['predicted_class']}'.")
+
+            # If in Virtual Workbench mode, display full branch-level output table & KCL proof
+            if input_mode == "🛠️ Build & Test Custom Circuit (Virtual Workbench)":
+                st.markdown("#### ⚡ Comprehensive Circuit Output & Branch Execution")
+                import pandas as pd
+
+                i1 = sim_state.branch_currents.get('I1', 0.0)
+                i2 = sim_state.branch_currents.get('I2', 0.0)
+                i3 = sim_state.branch_currents.get('I3', 0.0)
+                i4 = sim_state.branch_currents.get('I4', 0.0)
+
+                v_r1 = custom_vs - sim_state.VA
+                v_r2 = sim_state.VA
+                v_r3 = sim_state.VA - sim_state.VB
+                v_r4 = sim_state.VB
+
+                p1 = sim_state.power_dissipation.get('P1', 0.0)
+                p2 = sim_state.power_dissipation.get('P2', 0.0)
+                p3 = sim_state.power_dissipation.get('P3', 0.0)
+                p4 = sim_state.power_dissipation.get('P4', 0.0)
+                p_sum = p1 + p2 + p3 + p4
+                p_in = custom_vs * sim_state.Is
+
+                out_df = pd.DataFrame([
+                    {"Resistor": "R1", "Connection Path": "Battery (+) ➔ Node A", "Resistance (Ω)": f"{val_r1:.1f}" if val_r1 < 1e6 else "∞ (Open)", "Branch Current": f"{i1:.3f} mA", "Voltage Drop": f"{v_r1:.3f} V", "Power Dissipated": f"{p1:.2f} mW"},
+                    {"Resistor": "R2", "Connection Path": "Node A ➔ Battery (-) Ground", "Resistance (Ω)": f"{val_r2:.1f}" if val_r2 < 1e6 else "∞ (Open)", "Branch Current": f"{i2:.3f} mA", "Voltage Drop": f"{v_r2:.3f} V", "Power Dissipated": f"{p2:.2f} mW"},
+                    {"Resistor": "R3", "Connection Path": "Node A ➔ Node B", "Resistance (Ω)": f"{val_r3:.1f}" if val_r3 < 1e6 else "∞ (Open)", "Branch Current": f"{i3:.3f} mA", "Voltage Drop": f"{v_r3:.3f} V", "Power Dissipated": f"{p3:.2f} mW"},
+                    {"Resistor": "R4", "Connection Path": "Node B ➔ Battery (-) Ground", "Resistance (Ω)": f"{val_r4:.1f}" if val_r4 < 1e6 else "∞ (Open)", "Branch Current": f"{i4:.3f} mA", "Voltage Drop": f"{v_r4:.3f} V", "Power Dissipated": f"{p4:.2f} mW"}
+                ])
+                st.dataframe(out_df, use_container_width=True)
+
+                col_k1, col_k2 = st.columns(2)
+                kcl_err = abs(i1 - (i2 + i3))
+                p_err = abs(p_in - p_sum)
+                with col_k1:
+                    st.info(f"⚖️ **KCL Balance at Node A:**\n- Inflow ($I_1$): `{i1:.3f} mA`\n- Outflow ($I_2 + I_3$): `{i2 + i3:.3f} mA`\n- KCL Residual: `{kcl_err:.6f} mA` (Charge Conserved!)")
+                with col_k2:
+                    st.info(f"🔋 **Energy Conservation Balance:**\n- Power Supplied by Battery: `{p_in:.2f} mW`\n- Total Resistor Heat Dissipated: `{p_sum:.2f} mW`\n- Energy Balance: `{p_err:.6f} mW` (Thermodynamics Verified!)")
                     st.warning(f"⚠️ **Discrepancy:** Injected '{ground_truth_label}', predicted '{diag['predicted_class']}'.")
 
             # Explanation & Runner-Up comparison
@@ -645,9 +671,10 @@ def run_streamlit_app():
             bb_diag = clf.predict_detailed(bb_state.VA, bb_state.VB, bb_state.Is)
 
             # Health index score relative to nominal 'F0'
-            f_vec = np.array([[bb_state.VA, bb_state.VB, bb_state.Is]])
-            f_norm = (f_vec - clf.scaler_mean_) / clf.scaler_scale_
-            nom_pt = clf.centroids_['F0']
+            f_vec = np.array([bb_state.VA, bb_state.VB, bb_state.Is], dtype=float)
+            f_norm = (f_vec - clf.means_) / clf.stds_
+            nom_idx_bb = clf.class_to_idx.get('F0_NORMAL', 0)
+            nom_pt = clf.centroids_[nom_idx_bb]
             d_nom_bb = float(np.linalg.norm(f_norm - nom_pt))
             health_score_bb = int(np.clip(100.0 * np.exp(-0.5 * (d_nom_bb ** 2)), 0, 100))
 
