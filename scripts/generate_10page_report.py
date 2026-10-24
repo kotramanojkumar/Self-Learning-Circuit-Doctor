@@ -598,71 +598,66 @@ def create_10page_report(output_path: str):
     doc.add_page_break()
 
     # =========================================================================
-    # PAGE 10: REFERENCES AND TEAM CONTRIBUTIONS
+    # PAGE 10: REFERENCES AND ACADEMIC CITATIONS
     # =========================================================================
-    add_h1("References and Team Contributions")
+    add_h1("References")
 
-    add_h2("1. Verified References (IEEE Format)")
-    references = [
-        "[1] C. K. Alexander and M. N. Sadiku, Fundamentals of Electric Circuits, 7th ed. New York, NY: McGraw-Hill Education, 2020.",
-        "[2] R. L. Boylestad, Introductory Circuit Analysis, 13th ed. Boston, MA: Pearson Education, 2016.",
-        "[3] J. W. Bandler and A. E. Salama, \"Fault diagnosis of analog circuits,\" Proceedings of the IEEE, vol. 73, no. 8, pp. 1279–1325, Aug. 1985.",
-        "[4] R. Isermann, Fault-Diagnosis Systems: An Introduction from Fault Detection to Fault Tolerance. Berlin: Springer-Verlag, 2006.",
-        "[5] T. Hastie, R. Tibshirani, and J. Friedman, The Elements of Statistical Learning, 2nd ed. New York, NY: Springer, 2009.",
-        "[6] P. Falstad, \"Circuit Simulator Applet,\" Falstad.com, 2023. [Online]. Available: https://www.falstad.com/circuit/ [Accessed: Oct. 2026].",
-        "[7] F. Pedregosa et al., \"Scikit-learn: Machine learning in Python,\" Journal of Machine Learning Research, vol. 12, pp. 2825–2830, 2011."
+    add_h2("1. Foundational Circuit Theory and Analysis Textbooks")
+    refs_theory = [
+        "[1] C. K. Alexander and M. N. Sadiku, Fundamentals of Electric Circuits, 7th ed. New York, NY, USA: McGraw-Hill Education, 2020.",
+        "[2] R. L. Boylestad, Introductory Circuit Analysis, 13th ed. Boston, MA, USA: Pearson Education, 2016.",
+        "[3] J. W. Nilsson and S. A. Riedel, Electric Circuits, 11th ed. Boston, MA, USA: Pearson Education, 2018.",
+        "[4] W. H. Hayt, J. E. Kemmerly, and S. M. Durbin, Engineering Circuit Analysis, 9th ed. New York, NY, USA: McGraw-Hill, 2018."
     ]
-    for r in references:
+    for r in refs_theory:
         p_r = doc.add_paragraph()
-        p_r.paragraph_format.space_after = Pt(2.5)
+        p_r.paragraph_format.space_after = Pt(3.0)
         p_r.paragraph_format.left_indent = Inches(0.3)
         p_r.paragraph_format.first_line_indent = Inches(-0.3)
         r_run = p_r.add_run(r)
         r_run.font.name = 'Calibri'
-        r_run.font.size = Pt(8.5)
+        r_run.font.size = Pt(9.0)
         r_run.font.color.rgb = CHARCOAL
 
-    add_h2("2. Team Work Allocation Matrix")
-    t_tm = doc.add_table(rows=6, cols=3)
-    t_tm.alignment = WD_TABLE_ALIGNMENT.CENTER
-    t_tm.autofit = False
-    tm_hdrs = ["Project Milestone / Task", "KOTRA MANOJ KUMAR (23BCE2113)", "Mayank Yadav (23BCE0119)"]
-    for j, h in enumerate(tm_hdrs):
-        cell = t_tm.cell(0, j)
-        cell.text = h
-        set_cell_background(cell, "1A365D")
-        cell.paragraphs[0].runs[0].font.color.rgb = WHITE
-        cell.paragraphs[0].runs[0].font.bold = True
-        cell.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-
-    t_tm.columns[0].width = Inches(2.2)
-    t_tm.columns[1].width = Inches(2.4)
-    t_tm.columns[2].width = Inches(2.4)
-
-    tm_data = [
-        ("Electrical Theory & Nodal Analysis", "Lead: Hand derivations, KCL/KVL equations, nominal theoretical calculations", "Support: Software verification using matrix conductance solver (G·V = I)"),
-        ("Falstad Online Circuit Simulation", "Lead: Building 13 circuit models in Falstad, capturing digital probes, logging results", "Support: Creating automated ASCII schematic exporter and clickable web URLs"),
-        ("Machine Learning & Diagnostics", "Support: Validating component tolerance bands (5%) and physical constraints", "Lead: Implementing Z-score standardization, Nearest Centroid Classifier, and margin score"),
-        ("User Interface & Testing", "Support: Telemetry checking, UI testing, and conducting manual probe verifications", "Lead: Streamlit web app (`app.py`), Tkinter desktop GUI (`gui_tk.py`), and 22 unit tests"),
-        ("Documentation & Viva Preparation", "Shared: BEEE theory writeup, Viva Q&A preparation, reviewing report calculations", "Shared: ML methodology writeup, PPT slides, live demonstration script")
+    add_h2("2. Analog Circuit Fault Diagnostics and Pattern Classification")
+    refs_diag = [
+        "[5] J. W. Bandler and A. E. Salama, \"Fault diagnosis of analog circuits,\" Proceedings of the IEEE, vol. 73, no. 8, pp. 1279–1325, Aug. 1985.",
+        "[6] R. Isermann, Fault-Diagnosis Systems: An Introduction from Fault Detection to Fault Tolerance. Berlin, Germany: Springer-Verlag, 2006.",
+        "[7] T. Hastie, R. Tibshirani, and J. Friedman, The Elements of Statistical Learning: Data Mining, Inference, and Prediction, 2nd ed. New York, NY: Springer, 2009.",
+        "[8] R. O. Duda, P. E. Hart, and D. G. Stork, Pattern Classification, 2nd ed. New York, NY, USA: John Wiley & Sons, 2001."
     ]
-    for i, row in enumerate(tm_data):
-        cells = t_tm.rows[i+1].cells
-        for j in range(3):
-            cells[j].text = row[j]
-            set_cell_background(cells[j], "FFFFFF" if i % 2 == 0 else "F7FAFC")
-            p_c = cells[j].paragraphs[0]
-            p_c.runs[0].font.size = Pt(8.0)
-            p_c.paragraph_format.space_after = Pt(2)
+    for r in refs_diag:
+        p_r = doc.add_paragraph()
+        p_r.paragraph_format.space_after = Pt(3.0)
+        p_r.paragraph_format.left_indent = Inches(0.3)
+        p_r.paragraph_format.first_line_indent = Inches(-0.3)
+        r_run = p_r.add_run(r)
+        r_run.font.name = 'Calibri'
+        r_run.font.size = Pt(9.0)
+        r_run.font.color.rgb = CHARCOAL
 
-    add_h2("3. Essential Run Instructions")
+    add_h2("3. Simulation Platforms, Scientific Libraries, and Standards")
+    refs_soft = [
+        "[9] P. Falstad, \"Circuit Simulator Applet (Online SPICE engine),\" Falstad.com, 2023. [Online]. Available: https://www.falstad.com/circuit/ [Accessed: Oct. 2026].",
+        "[10] F. Pedregosa et al., \"Scikit-learn: Machine learning in Python,\" Journal of Machine Learning Research, vol. 12, pp. 2825–2830, 2011.",
+        "[11] C. R. Harris et al., \"Array programming with NumPy,\" Nature, vol. 585, no. 7825, pp. 357–362, Sep. 2020."
+    ]
+    for r in refs_soft:
+        p_r = doc.add_paragraph()
+        p_r.paragraph_format.space_after = Pt(3.0)
+        p_r.paragraph_format.left_indent = Inches(0.3)
+        p_r.paragraph_format.first_line_indent = Inches(-0.3)
+        r_run = p_r.add_run(r)
+        r_run.font.name = 'Calibri'
+        r_run.font.size = Pt(9.0)
+        r_run.font.color.rgb = CHARCOAL
+
     add_body(
-        "• Install dependencies: pip install -r requirements.txt\n"
-        "• Run 22 unit tests: python -m pytest tests/ -v\n"
-        "• Launch interactive web interface: streamlit run app.py\n"
-        "• Launch offline desktop interface: python gui_tk.py",
-        bold_prefix="Quick Execution Commands:\n",
-        space_after=2
+        "All analytical nodal derivations, circuit models, stochastic evaluations, and software implementations "
+        "documented in this report were developed for the course Basic Electrical and Electronics Engineering (BEEE), "
+        "School of Electrical Engineering (SELECT), Vellore Institute of Technology (VIT), Vellore.",
+        bold_prefix="Academic Integrity & Verification Note: ",
+        space_after=4
     )
 
     # Save document

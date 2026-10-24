@@ -491,12 +491,10 @@ def build_full_report(output_path: str):
         ("    9.4 Final Concluding Remarks", "37"),
         ("References (IEEE Style)", "38"),
         ("Appendices", "39"),
-        ("    Appendix A: Two-Member Project Work Allocation Matrix", "39"),
-        ("    Appendix B: Step-by-Step Mathematical Derivations and KCL Proofs", "40"),
-        ("    Appendix C: Falstad Simulation Experiment Log (13 Operating Conditions)", "41"),
-        ("    Appendix D: Top 20 Comprehensive Viva Voce Questions and Model Answers", "42"),
-        ("    Appendix E: Two-Minute Elevator Pitch & Five-Minute Faculty Demo Script", "45"),
-        ("    Appendix F: Source Code Excerpts and Execution Instructions", "46")
+        ("    Appendix A: Step-by-Step Mathematical Derivations and KCL Proofs", "39"),
+        ("    Appendix B: Falstad Simulation Experiment Log (13 Operating Conditions)", "40"),
+        ("    Appendix C: Top 20 Comprehensive Viva Voce Questions and Model Answers", "41"),
+        ("    Appendix D: Two-Minute Elevator Pitch & Five-Minute Faculty Demo Script", "44")
     ]
 
     t_toc = doc.add_table(rows=len(toc_items) + 1, cols=2)
@@ -1662,43 +1660,7 @@ def build_full_report(output_path: str):
     # =========================================================================
     add_h1("Appendices")
 
-    add_h2("Appendix A: Two-Member Project Work Allocation Matrix")
-    add_body("The project was carried out as a collaborative two-member engineering partnership with clearly defined responsibilities:")
-
-    t_alloc = doc.add_table(rows=7, cols=3)
-    t_alloc.alignment = WD_TABLE_ALIGNMENT.CENTER
-    t_alloc.autofit = False
-    alloc_hdrs = ["Project Milestone / Task Domain", "KOTRA MANOJ KUMAR (23BCE2113)", "Mayank Yadav (23BCE0119)"]
-    for j, h in enumerate(alloc_hdrs):
-        cell = t_alloc.cell(0, j)
-        cell.text = h
-        set_cell_background(cell, "1A365D")
-        cell.paragraphs[0].runs[0].font.color.rgb = WHITE
-        cell.paragraphs[0].runs[0].font.bold = True
-        cell.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-
-    t_alloc.columns[0].width = Inches(2.4)
-    t_alloc.columns[1].width = Inches(2.4)
-    t_alloc.columns[2].width = Inches(2.4)
-
-    alloc_data = [
-        ("Electrical Theory & Nodal Derivations", "Lead: Hand derivations, KCL/KVL formulas, equivalent resistances, nominal point calculations", "Support: Software verification of analytical nodal formulas via matrix conductance solver"),
-        ("Falstad Online Simulation", "Lead: Building 13 circuit models in Falstad, capturing digital probes, recording experiment log", "Support: Developing automated ASCII schematic exporter and clickable web URL generator"),
-        ("Python Modeling & Machine Learning", "Support: Reviewing circuit tolerance bands, sensor noise limits, and physical assumptions", "Lead: Dataset generator (1,950 samples), Z-score standardization, nearest centroid classifier"),
-        ("Evaluation & Sensitivity Curves", "Support: Analyzing baseline vs classifier performance, reviewing ambiguity cases (R1 open vs R2 short)", "Lead: Generating confusion matrices, tolerance sweep curves, and noise sensitivity curves"),
-        ("User Interface Development", "Support: UI telemetry checking, verifying circuit diagram layouts, user testing", "Lead: Developing Streamlit web application (`app.py`) and offline Tkinter GUI (`gui_tk.py`)"),
-        ("Documentation & Viva Preparation", "Shared: BEEE theory writeup, Viva Voce Q&A preparation, reviewing report calculations", "Shared: ML methodology writeup, PPT presentation slides, live demonstration scripts")
-    ]
-    for i, row in enumerate(alloc_data):
-        cells = t_alloc.rows[i+1].cells
-        for j in range(3):
-            cells[j].text = row[j]
-            set_cell_background(cells[j], "FFFFFF" if i % 2 == 0 else "F7FAFC")
-            p_c = cells[j].paragraphs[0]
-            p_c.runs[0].font.size = Pt(8.5)
-            p_c.paragraph_format.space_after = Pt(2)
-
-    add_h2("Appendix B: Step-by-Step Mathematical Derivations and KCL Proofs")
+    add_h2("Appendix A: Step-by-Step Mathematical Derivations and KCL Proofs")
     add_body(
         "Proof of Power Conservation:\n"
         "Input Power Supplied by 10V DC Source:\n"
@@ -1713,10 +1675,10 @@ def build_full_report(output_path: str):
         "    Ptot == Pin (exact equality verified within 10^-12 W)."
     )
 
-    add_h2("Appendix C: Falstad Simulation Experiment Log (13 Operating Conditions)")
+    add_h2("Appendix B: Falstad Simulation Experiment Log (13 Operating Conditions)")
     add_body("Refer to Table 6.2 in Chapter 6 for the complete, verified 13-class Falstad SPICE simulation experiment log.")
 
-    add_h2("Appendix D: Top 20 Comprehensive Viva Voce Questions and Model Answers")
+    add_h2("Appendix C: Top 20 Comprehensive Viva Voce Questions and Model Answers")
     viva_qa = [
         ("Q1: What is the primary problem this project solves?",
          "It automatically identifies, diagnoses, and localizes component failures (opens, shorts, and resistance drift) in a DC network using external voltage and current measurements, without needing to desolder or probe individual resistors."),
@@ -1774,7 +1736,7 @@ def build_full_report(output_path: str):
         r_a.font.size = Pt(9.5)
         r_a.font.color.rgb = CHARCOAL
 
-    add_h2("Appendix E: Two-Minute Pitch & Five-Minute Faculty Demonstration Script")
+    add_h2("Appendix D: Two-Minute Pitch & Five-Minute Faculty Demonstration Script")
     add_body(
         "TWO-MINUTE ELEVATOR PITCH:\n"
         "'Good morning professors. When an electrical circuit fails in an industrial plant or an electric vehicle, "
@@ -1802,17 +1764,6 @@ def build_full_report(output_path: str):
         "• Minute 5: Demonstrate supervised self-learning. Enter a verified lab reading in the Self-Learning tab, click 'Ingest Sample', "
         "and show faculty the live centroid shift and incremented sample count.",
         bold_prefix="Five-Minute Demonstration Script:\n"
-    )
-
-    add_h2("Appendix F: Source Code Excerpts and Execution Instructions")
-    add_body(
-        "To reproduce all findings from scratch on any standard Python 3.10+ environment:\n"
-        "1. Install dependencies: pip install -r requirements.txt\n"
-        "2. Run automated test suite: python -m pytest tests/ -v\n"
-        "3. Launch interactive web app: streamlit run app.py\n"
-        "4. Launch offline desktop GUI: python gui_tk.py\n"
-        "5. Re-generate datasets & figures: python -m src.evaluation\n"
-        "6. Re-generate project reports: python scripts/generate_complete_report.py"
     )
 
     # Save document to target path
