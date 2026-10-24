@@ -391,25 +391,5 @@ def run_streamlit_app():
 
 
 if __name__ == '__main__':
-    # Check if executed inside Streamlit
-    try:
-        import streamlit as st
-        # If run directly as python app.py, display instructions and launch CLI test
-        if not hasattr(st, '_is_running_with_streamlit') or not st._is_running_with_streamlit:
-            print("=" * 70)
-            print("SELF-LEARNING CIRCUIT DOCTOR - STREAMLIT GUI")
-            print("=" * 70)
-            print("To launch the interactive graphical web interface, run:")
-            print("    streamlit run app.py")
-            print("=" * 70)
-        else:
-            run_streamlit_app()
-    except ImportError:
-        print("Streamlit not yet installed or running in CLI mode.")
-        print("Run 'pip install streamlit' then 'streamlit run app.py'.")
-    except Exception as e:
-        # If streamlit is imported and running under streamlit runner:
-        try:
-            run_streamlit_app()
-        except Exception as inner_e:
-            print(f"Error starting app: {inner_e}")
+    run_streamlit_app()
+
