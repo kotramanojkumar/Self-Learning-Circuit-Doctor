@@ -458,6 +458,259 @@ def run_streamlit_app():
             - **Common Ground Rationale:** All voltages are referenced to a single common 0V ground rail, minimizing probe complexity and mirroring industrial ground planes.
             """)
 
+        st.markdown("---")
+        st.subheader("🛠️ Interactive Breadboard Studio: Wire Components & Test Circuit")
+        st.write(
+            "Simulate placing physical resistors, jumper wires, and multimeter sensor probes into solderless breadboard tie-points. "
+            "Configure your connections below and click **'⚡ Test Breadboard Connections & Circuit Health'** to verify whether it works!"
+        )
+
+        # Initialize session state for breadboard wiring if not set
+        if 'bb_r1_lead1' not in st.session_state:
+            st.session_state.bb_r1_lead1 = "+10V Rail (via DMM1)"
+        if 'bb_r1_lead2' not in st.session_state:
+            st.session_state.bb_r1_lead2 = "Node A (Row 10)"
+        if 'bb_r1_val' not in st.session_state:
+            st.session_state.bb_r1_val = 1000.0
+
+        if 'bb_r2_lead1' not in st.session_state:
+            st.session_state.bb_r2_lead1 = "Node A (Row 10)"
+        if 'bb_r2_lead2' not in st.session_state:
+            st.session_state.bb_r2_lead2 = "GND Rail (0V)"
+        if 'bb_r2_val' not in st.session_state:
+            st.session_state.bb_r2_val = 2000.0
+
+        if 'bb_r3_lead1' not in st.session_state:
+            st.session_state.bb_r3_lead1 = "Node A (Row 10)"
+        if 'bb_r3_lead2' not in st.session_state:
+            st.session_state.bb_r3_lead2 = "Node B (Row 20)"
+        if 'bb_r3_val' not in st.session_state:
+            st.session_state.bb_r3_val = 1500.0
+
+        if 'bb_r4_lead1' not in st.session_state:
+            st.session_state.bb_r4_lead1 = "Node B (Row 20)"
+        if 'bb_r4_lead2' not in st.session_state:
+            st.session_state.bb_r4_lead2 = "GND Rail (0V)"
+        if 'bb_r4_val' not in st.session_state:
+            st.session_state.bb_r4_val = 3000.0
+
+        # Quick action preset buttons
+        col_bb_btn1, col_bb_btn2, col_bb_btn3, col_bb_btn4 = st.columns(4)
+        with col_bb_btn1:
+            if st.button("🟢 Wire 100% Correct Circuit"):
+                st.session_state.bb_r1_lead1 = "+10V Rail (via DMM1)"
+                st.session_state.bb_r1_lead2 = "Node A (Row 10)"
+                st.session_state.bb_r1_val = 1000.0
+                st.session_state.bb_r2_lead1 = "Node A (Row 10)"
+                st.session_state.bb_r2_lead2 = "GND Rail (0V)"
+                st.session_state.bb_r2_val = 2000.0
+                st.session_state.bb_r3_lead1 = "Node A (Row 10)"
+                st.session_state.bb_r3_lead2 = "Node B (Row 20)"
+                st.session_state.bb_r3_val = 1500.0
+                st.session_state.bb_r4_lead1 = "Node B (Row 20)"
+                st.session_state.bb_r4_lead2 = "GND Rail (0V)"
+                st.session_state.bb_r4_val = 3000.0
+                st.rerun()
+
+        with col_bb_btn2:
+            if st.button("⚠️ Mistake: Missed Hole (R2 Open)"):
+                st.session_state.bb_r2_lead2 = "Disconnected / Floating Pin"
+                st.rerun()
+
+        with col_bb_btn3:
+            if st.button("🚨 Mistake: Accidental Short (R2 Short)"):
+                st.session_state.bb_r2_lead1 = "GND Rail (0V)"
+                st.rerun()
+
+        with col_bb_btn4:
+            if st.button("🟡 Mistake: Wrong Value R3 (3.3k)"):
+                st.session_state.bb_r3_val = 3300.0
+                st.rerun()
+
+        st.markdown("##### 🔌 Breadboard Pin Connections & Resistor Insertion:")
+        lead_options_all = [
+            "+10V Rail (via DMM1)",
+            "Node A (Row 10)",
+            "Node B (Row 20)",
+            "GND Rail (0V)",
+            "Disconnected / Floating Pin"
+        ]
+
+        bb_c1, bb_c2, bb_c3, bb_c4 = st.columns(4)
+
+        with bb_c1:
+            st.markdown("**Resistor R1** (1.0 kΩ [Brown-Black-Red])")
+            idx_1_1 = lead_options_all.index(st.session_state.bb_r1_lead1) if st.session_state.bb_r1_lead1 in lead_options_all else 0
+            idx_1_2 = lead_options_all.index(st.session_state.bb_r1_lead2) if st.session_state.bb_r1_lead2 in lead_options_all else 1
+            l1_1 = st.selectbox("Lead 1 Pin:", lead_options_all, index=idx_1_1, key="bb_k_r1_1")
+            l1_2 = st.selectbox("Lead 2 Pin:", lead_options_all, index=idx_1_2, key="bb_k_r1_2")
+            v1 = st.number_input("R1 Resistance (Ω):", min_value=1.0, max_value=500000.0, value=float(st.session_state.bb_r1_val), step=50.0, key="bb_k_r1_v")
+
+        with bb_c2:
+            st.markdown("**Resistor R2** (2.0 kΩ [Red-Black-Red])")
+            idx_2_1 = lead_options_all.index(st.session_state.bb_r2_lead1) if st.session_state.bb_r2_lead1 in lead_options_all else 1
+            idx_2_2 = lead_options_all.index(st.session_state.bb_r2_lead2) if st.session_state.bb_r2_lead2 in lead_options_all else 3
+            l2_1 = st.selectbox("Lead 1 Pin:", lead_options_all, index=idx_2_1, key="bb_k_r2_1")
+            l2_2 = st.selectbox("Lead 2 Pin:", lead_options_all, index=idx_2_2, key="bb_k_r2_2")
+            v2 = st.number_input("R2 Resistance (Ω):", min_value=1.0, max_value=500000.0, value=float(st.session_state.bb_r2_val), step=50.0, key="bb_k_r2_v")
+
+        with bb_c3:
+            st.markdown("**Resistor R3** (1.5 kΩ [Brown-Green-Red])")
+            idx_3_1 = lead_options_all.index(st.session_state.bb_r3_lead1) if st.session_state.bb_r3_lead1 in lead_options_all else 1
+            idx_3_2 = lead_options_all.index(st.session_state.bb_r3_lead2) if st.session_state.bb_r3_lead2 in lead_options_all else 2
+            l3_1 = st.selectbox("Lead 1 Pin:", lead_options_all, index=idx_3_1, key="bb_k_r3_1")
+            l3_2 = st.selectbox("Lead 2 Pin:", lead_options_all, index=idx_3_2, key="bb_k_r3_2")
+            v3 = st.number_input("R3 Resistance (Ω):", min_value=1.0, max_value=500000.0, value=float(st.session_state.bb_r3_val), step=50.0, key="bb_k_r3_v")
+
+        with bb_c4:
+            st.markdown("**Resistor R4** (3.0 kΩ [Orange-Black-Red])")
+            idx_4_1 = lead_options_all.index(st.session_state.bb_r4_lead1) if st.session_state.bb_r4_lead1 in lead_options_all else 2
+            idx_4_2 = lead_options_all.index(st.session_state.bb_r4_lead2) if st.session_state.bb_r4_lead2 in lead_options_all else 3
+            l4_1 = st.selectbox("Lead 1 Pin:", lead_options_all, index=idx_4_1, key="bb_k_r4_1")
+            l4_2 = st.selectbox("Lead 2 Pin:", lead_options_all, index=idx_4_2, key="bb_k_r4_2")
+            v4 = st.number_input("R4 Resistance (Ω):", min_value=1.0, max_value=500000.0, value=float(st.session_state.bb_r4_val), step=50.0, key="bb_k_r4_v")
+
+        # Evaluate physical breadboard continuity and map to branch resistances
+        bb_errors = []
+        eff_r1 = v1
+        eff_r2 = v2
+        eff_r3 = v3
+        eff_r4 = v4
+
+        # R1 evaluation
+        if l1_1 == l1_2:
+            eff_r1 = 1e-6
+            bb_errors.append(f"⚠️ R1 is shorted! Both leads are plugged into the exact same tie-point ('{l1_1}').")
+        elif not ((l1_1 == "+10V Rail (via DMM1)" and l1_2 == "Node A (Row 10)") or (l1_2 == "+10V Rail (via DMM1)" and l1_1 == "Node A (Row 10)")):
+            if "Disconnected / Floating Pin" in (l1_1, l1_2):
+                eff_r1 = 1e9
+                bb_errors.append("❌ R1 open circuit: Lead is disconnected from the breadboard (floating).")
+            else:
+                eff_r1 = 1e9
+                bb_errors.append(f"❌ R1 miswired between '{l1_1}' and '{l1_2}'. Must connect '+10V Rail' to 'Node A (Row 10)'.")
+
+        # R2 evaluation
+        if l2_1 == l2_2:
+            eff_r2 = 1e-6
+            bb_errors.append(f"⚠️ R2 is shorted! Both leads are plugged into the exact same tie-point ('{l2_1}').")
+        elif not ((l2_1 == "Node A (Row 10)" and l2_2 == "GND Rail (0V)") or (l2_2 == "Node A (Row 10)" and l2_1 == "GND Rail (0V)")):
+            if "Disconnected / Floating Pin" in (l2_1, l2_2):
+                eff_r2 = 1e9
+                bb_errors.append("❌ R2 open circuit: Lead is disconnected from Ground rail (floating).")
+            else:
+                eff_r2 = 1e9
+                bb_errors.append(f"❌ R2 miswired between '{l2_1}' and '{l2_2}'. Must connect 'Node A (Row 10)' to 'GND Rail (0V)'.")
+
+        # R3 evaluation
+        if l3_1 == l3_2:
+            eff_r3 = 1e-6
+            bb_errors.append("⚠️ R3 is shorted! Direct wire bridge connecting Row 10 directly to Row 10.")
+        elif not ((l3_1 == "Node A (Row 10)" and l3_2 == "Node B (Row 20)") or (l3_2 == "Node A (Row 10)" and l3_1 == "Node B (Row 20)")):
+            if "Disconnected / Floating Pin" in (l3_1, l3_2):
+                eff_r3 = 1e9
+                bb_errors.append("❌ R3 open circuit: Bridge wire between Node A and Node B is broken.")
+            else:
+                eff_r3 = 1e9
+                bb_errors.append(f"❌ R3 miswired between '{l3_1}' and '{l3_2}'. Must bridge 'Node A (Row 10)' to 'Node B (Row 20)'.")
+
+        # R4 evaluation
+        if l4_1 == l4_2:
+            eff_r4 = 1e-6
+            bb_errors.append(f"⚠️ R4 is shorted! Both leads are plugged into the exact same tie-point ('{l4_1}').")
+        elif not ((l4_1 == "Node B (Row 20)" and l4_2 == "GND Rail (0V)") or (l4_2 == "Node B (Row 20)" and l4_1 == "GND Rail (0V)")):
+            if "Disconnected / Floating Pin" in (l4_1, l4_2):
+                eff_r4 = 1e9
+                bb_errors.append("❌ R4 open circuit: Lower shunt lead is disconnected from Ground (floating).")
+            else:
+                eff_r4 = 1e9
+                bb_errors.append(f"❌ R4 miswired between '{l4_1}' and '{l4_2}'. Must connect 'Node B (Row 20)' to 'GND Rail (0V)'.")
+
+        # Value checks
+        if abs(v1 - 1000.0) / 1000.0 > 0.08:
+            bb_errors.append(f"🟡 Component Value Warning: R1 is {v1:.0f} Ω (Standard nominal: 1000 Ω ±5%).")
+        if abs(v2 - 2000.0) / 2000.0 > 0.08:
+            bb_errors.append(f"🟡 Component Value Warning: R2 is {v2:.0f} Ω (Standard nominal: 2000 Ω ±5%).")
+        if abs(v3 - 1500.0) / 1500.0 > 0.08:
+            bb_errors.append(f"🟡 Component Value Warning: R3 is {v3:.0f} Ω (Standard nominal: 1500 Ω ±5%).")
+        if abs(v4 - 3000.0) / 3000.0 > 0.08:
+            bb_errors.append(f"🟡 Component Value Warning: R4 is {v4:.0f} Ω (Standard nominal: 3000 Ω ±5%).")
+
+        # Test button
+        if st.button("⚡ Test Breadboard Connections & Circuit Health", type="primary", key="btn_bb_test"):
+            # Solve the physical circuit created on breadboard
+            bb_net = DCResistorNetwork(Vs=10.0, R1=eff_r1, R2=eff_r2, R3=eff_r3, R4=eff_r4)
+            bb_state = bb_net.solve()
+
+            # Classifier telemetry
+            bb_diag = clf.predict_detailed(bb_state.VA, bb_state.VB, bb_state.Is)
+
+            # Health index score relative to nominal 'F0'
+            f_vec = np.array([[bb_state.VA, bb_state.VB, bb_state.Is]])
+            f_norm = (f_vec - clf.scaler_mean_) / clf.scaler_scale_
+            nom_pt = clf.centroids_['F0']
+            d_nom_bb = float(np.linalg.norm(f_norm - nom_pt))
+            health_score_bb = int(np.clip(100.0 * np.exp(-0.5 * (d_nom_bb ** 2)), 0, 100))
+
+            st.markdown("---")
+            st.markdown("### 📋 Breadboard Continuity & Health Inspection Report")
+
+            # Health Verdict Banner
+            if len(bb_errors) == 0:
+                st.success(f"### 🟢 BREADBOARD TEST: PASS — WORKING PERFECTLY (HEALTH SCORE: {health_score_bb}%)")
+                st.write(
+                    "**Continuity Check: 100% Successful!** All 4 resistors are correctly placed into the breadboard tie-points. "
+                    "Node A (Row 10) and Node B (Row 20) are fully formed, and the circuit operates strictly within standard ±5% BEEE specifications."
+                )
+            elif d_nom_bb <= 1.85 and "❌" not in str(bb_errors) and "⚠️" not in str(bb_errors):
+                st.warning(f"### 🟡 BREADBOARD TEST: WARNING — VALUE DEVIATION DETECTED (HEALTH SCORE: {health_score_bb}%)")
+                st.write(
+                    "**Wiring Check: Wired correctly, but component values deviate from standard specifications!** "
+                    "One or more resistors have incorrect values or significant drift."
+                )
+            else:
+                st.error(f"### 🔴 BREADBOARD TEST: FAIL — WIRING ERROR / DEFECTIVE (HEALTH SCORE: {health_score_bb}%)")
+                st.write(
+                    "**Continuity Check: Wiring Failure Detected!** The breadboard connections do not form a complete, healthy circuit. "
+                    "A disconnected wire, open tie-point, or short circuit was identified by the Circuit Doctor."
+                )
+
+            st.progress(health_score_bb / 100.0)
+
+            # Display specific breadboard pin errors if any
+            if bb_errors:
+                st.markdown("##### 🔍 Identified Breadboard Wiring Issues:")
+                for err in bb_errors:
+                    st.write(f"- {err}")
+
+            # Live DMM Probes readout
+            st.markdown("##### 📟 Virtual Multimeter Readings from Breadboard:")
+            col_m1, col_m2, col_m3, col_m4, col_m5 = st.columns(5)
+            col_m1.metric("DMM 2 (Node A: Row 10)", f"{bb_state.VA:.3f} V", delta=f"{bb_state.VA - 5.806:.3f} V vs Nom")
+            col_m2.metric("DMM 3 (Node B: Row 20)", f"{bb_state.VB:.3f} V", delta=f"{bb_state.VB - 3.871:.3f} V vs Nom")
+            col_m3.metric("DMM 1 (Source Current Is)", f"{bb_state.Is:.3f} mA", delta=f"{bb_state.Is - 4.194:.3f} mA vs Nom")
+            req_disp = f"{bb_state.Req:.1f} Ω" if bb_state.Req < 1e6 else "∞ (Open)"
+            col_m4.metric("Breadboard Resistance", req_disp)
+            col_m5.metric("Power Dissipated", f"{10.0 * bb_state.Is:.2f} mW")
+
+            # Doctor's Actionable Prescription
+            prescriptions = {
+                'F0': "✅ **Doctor's Note:** Breadboard connections are 100% correct. Ready for laboratory evaluation.",
+                'F1': "🔧 **Doctor's Prescription:** R1 is **OPEN**. Ensure R1 is firmly plugged into the +10V Top Red Rail and Row 10.",
+                'F2': "🔧 **Doctor's Prescription:** R2 is **OPEN**. Ensure R2 Lead 2 is firmly plugged into the Bottom Blue Ground Rail (0V).",
+                'F3': "🔧 **Doctor's Prescription:** R3 is **OPEN**. Ensure R3 bridges Row 10 (Node A) and Row 20 (Node B).",
+                'F4': "🔧 **Doctor's Prescription:** R4 is **OPEN**. Ensure R4 Lead 2 is firmly plugged into the Bottom Blue Ground Rail (0V).",
+                'F5': "⚠️ **Doctor's Prescription:** R1 is **SHORTED**. Ensure R1 leads are in separate tie-point rows.",
+                'F6': "🚨 **Doctor's Prescription:** R2 is **SHORTED**. Solder bridge or lead short to Ground! Move Row 10 wire away from GND rail.",
+                'F7': "⚠️ **Doctor's Prescription:** R3 is **SHORTED**. Node A and B are directly touching. Separate Row 10 and Row 20.",
+                'F8': "⚠️ **Doctor's Prescription:** R4 is **SHORTED**. Row 20 is shorted to Ground. Unplug the shorting wire.",
+                'F9': "🔍 **Doctor's Prescription:** R1 value is too high (drifted +50%). Replace with Brown-Black-Red 1.0 kΩ resistor.",
+                'F10': "🔍 **Doctor's Prescription:** R2 value is too high (drifted +50%). Replace with Red-Black-Red 2.0 kΩ resistor.",
+                'F11': "🔍 **Doctor's Prescription:** R3 value is too low (-50%). Replace with Brown-Green-Red 1.5 kΩ resistor.",
+                'F12': "🔍 **Doctor's Prescription:** R4 value is too low (-50%). Replace with Orange-Black-Red 3.0 kΩ resistor."
+            }
+            rx = prescriptions.get(bb_diag['predicted_code'], "Check all wire connections against the reference wiring diagram.")
+            st.info(f"💊 **Doctor's Breadboard Prescription:**\n{rx}")
+
     # =========================================================================
     # TAB 3: FAULT TOPOLOGIES & AMBIGUITY RESOLUTION
     # =========================================================================
